@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { getTopUploaders, getTopDownloaders } from '../services/users';
 import Avatar from '../components/common/Avatar';
 import { PageLoader } from '../components/common/LoadingSpinner';
-import { HiOutlineTrophy, HiOutlineUpload, HiOutlineDownload } from 'react-icons/hi2';
+import { HiOutlineStar, HiOutlineUpload, HiOutlineDownload } from 'react-icons/hi';
 import { BRANCHES } from '../config/constants';
 import clsx from 'clsx';
 
@@ -54,7 +54,7 @@ export default function LeaderboardPage() {
       {/* Header */}
       <div className="text-center mb-10">
         <div className="w-16 h-16 bg-gradient-to-br from-accent-300 to-accent-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-gold-glow">
-          <HiOutlineTrophy className="w-8 h-8 text-white" />
+          <HiOutlineStar className="w-8 h-8 text-white" />
         </div>
         <h1 className="font-display font-bold text-3xl text-slate-800">Leaderboard</h1>
         <p className="text-slate-500 mt-1">Top JNCT students contributing to CampusShare.</p>
@@ -86,7 +86,7 @@ export default function LeaderboardPage() {
 
       {list.length === 0 ? (
         <div className="text-center py-16 text-slate-400">
-          <HiOutlineTrophy className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+          <HiOutlineStar className="w-12 h-12 mx-auto mb-3 text-slate-300" />
           <p className="font-medium">No activity yet.</p>
           <p className="text-sm mt-1">Be the first to climb the leaderboard!</p>
         </div>

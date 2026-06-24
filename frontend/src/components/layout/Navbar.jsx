@@ -15,8 +15,8 @@ import {
   HiX,
   HiOutlineViewGrid,
   HiOutlineBookmark,
+  HiOutlineStar,
 } from 'react-icons/hi';
-import { HiOutlineTrophy } from 'react-icons/hi2';
 
 export default function Navbar() {
   const { currentUser, userProfile, logout, isAdmin } = useAuth();
@@ -177,7 +177,7 @@ export default function Navbar() {
               <HiOutlineSearch className="w-4 h-4" /> Browse Resources
             </NavLink>
             <NavLink to="/leaderboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-700 hover:bg-slate-50 font-medium">
-              <HiOutlineTrophy className="w-4 h-4" /> Leaderboard
+              <HiOutlineStar className="w-4 h-4" /> Leaderboard
             </NavLink>
             {currentUser && (
               <>
