@@ -15,15 +15,15 @@ service cloud.firestore {
       return isAuth() && request.auth.uid == uid;
     }
 
-    // Users
+    // Users — public read so homepage stats work for logged-out visitors
     match /users/{userId} {
-      allow read: if isAuth();
+      allow read: if true;
       allow create: if isOwner(userId);
       allow update: if isOwner(userId) || isAdmin();
       allow delete: if isAdmin();
     }
 
-    // Resources
+    // Resources — public read, authenticated write
     match /resources/{resourceId} {
       allow read: if true;
       allow create: if isAuth();
@@ -35,11 +35,26 @@ service cloud.firestore {
       );
     }
 
-    // Ratings
+    // Ratings — public read, authenticated write (one per user per resource)
     match /ratings/{ratingId} {
       allow read: if true;
       allow write: if isAuth() &&
         ratingId == request.auth.uid + '_' + request.resource.data.resourceId;
+    }
+
+    // Bookmarks — private to the owner only
+    match /bookmarks/{bookmarkId} {
+      allow read, write: if isAuth() &&
+        request.auth.uid == resource.data.userId;
+      allow create: if isAuth() &&
+        request.auth.uid == request.resource.data.userId;
+    }
+
+    // Flags — authenticated users can report, admins can read all
+    match /flags/{flagId} {
+      allow read: if isAdmin();
+      allow create: if isAuth();
+      allow delete: if isAdmin();
     }
   }
 }

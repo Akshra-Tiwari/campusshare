@@ -132,13 +132,13 @@ export default function UploadPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Free plan notice */}
-        <div className="bg-accent-50 border border-accent-200 rounded-xl p-3 flex items-start gap-2.5">
-          <svg className="w-4 h-4 text-accent-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        {/* Upload info notice */}
+        <div className="bg-primary-50 border border-primary-200 rounded-xl p-3 flex items-start gap-2.5">
+          <svg className="w-4 h-4 text-primary-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <p className="text-xs text-accent-800 leading-relaxed">
-            Files are limited to <strong>700KB</strong> on the free plan. For larger PDFs, try compressing them first (e.g. <a href="https://www.ilovepdf.com/compress_pdf" target="_blank" rel="noopener noreferrer" className="underline font-medium">ilovepdf.com/compress_pdf</a>).
+          <p className="text-xs text-primary-800 leading-relaxed">
+            Files up to <strong>10MB</strong> are supported (PDF, JPG, PNG, WEBP). Larger scanned PDFs may take a few extra seconds to upload.
           </p>
         </div>
 
@@ -179,7 +179,7 @@ export default function UploadPage() {
               <p className="font-semibold text-slate-600 text-sm">
                 {isDragActive ? 'Drop the file here...' : 'Drag & drop your file here'}
               </p>
-              <p className="text-xs text-slate-400 mt-1">or click to browse — PDF, JPG, PNG, WEBP · Max 700KB</p>
+              <p className="text-xs text-slate-400 mt-1">or click to browse — PDF, JPG, PNG, WEBP · Max 10MB</p>
             </div>
           )}
         </div>

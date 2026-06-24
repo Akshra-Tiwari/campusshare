@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getUserResources, deleteResource } from '../services/firestore';
+import { deleteResourceViaBackend } from '../services/api';
 import ResourceCard from '../components/common/ResourceCard';
-import { PageLoader } from '../components/common/LoadingSpinner';
+import { SkeletonRow } from '../components/common/LoadingSpinner';
 import EmptyState from '../components/common/EmptyState';
 import Avatar from '../components/common/Avatar';
 import { HiOutlineUpload, HiOutlineDownload, HiOutlineDocumentText, HiOutlineTrash, HiOutlineUser, HiOutlinePencil } from 'react-icons/hi';
@@ -50,7 +51,14 @@ export default function DashboardPage() {
     if (!window.confirm(`Delete "${resource.title}"? This cannot be undone.`)) return;
     setDeleting(resource.id);
     try {
-      await deleteResource(resource.id, resource.filePath, currentUser.uid);
+      try {
+        // Preferred path: backend also cleans up the Cloudinary file.
+        await deleteResourceViaBackend(resource.id);
+      } catch (backendErr) {
+        // Backend unreachable (e.g. running frontend-only locally) — still
+        // remove the Firestore doc so the UI stays consistent.
+        await deleteResource(resource.id, resource.filePath, currentUser.uid);
+      }
       setResources((prev) => prev.filter((r) => r.id !== resource.id));
       await refreshUserProfile();
       toast.success('Resource deleted.');
@@ -60,8 +68,6 @@ export default function DashboardPage() {
       setDeleting(null);
     }
   };
-
-  if (loading) return <PageLoader />;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-slide-up">
@@ -117,7 +123,11 @@ export default function DashboardPage() {
       <div>
         <h2 className="font-display font-bold text-xl text-slate-800 mb-5">My Uploads ({resources.length})</h2>
 
-        {resources.length === 0 ? (
+        {loading ? (
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, i) => <SkeletonRow key={i} />)}
+          </div>
+        ) : resources.length === 0 ? (
           <EmptyState
             title="No uploads yet"
             description="Share your notes and help fellow JNCT students. Start by uploading your first resource."

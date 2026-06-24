@@ -23,9 +23,14 @@ export default function SearchFilters({ onSearch, onFilter, initialFilters = {} 
     }
   }, [filters.branch, filters.semester]);
 
-  const handleSearch = (e) => {
+  const handleSearchSubmit = (e) => {
     e.preventDefault();
-    onSearch?.(searchTerm, filters);
+    onSearch?.(searchTerm);
+  };
+
+  const handleSearchInput = (value) => {
+    setSearchTerm(value);
+    onSearch?.(value); // parent debounces this
   };
 
   const handleFilterChange = (key, value) => {
@@ -41,7 +46,7 @@ export default function SearchFilters({ onSearch, onFilter, initialFilters = {} 
     const cleared = { branch: '', semester: '', type: '', subject: '' };
     setFilters(cleared);
     setSearchTerm('');
-    onSearch?.('', cleared);
+    onSearch?.('');
     onFilter?.(cleared);
   };
 
@@ -50,16 +55,19 @@ export default function SearchFilters({ onSearch, onFilter, initialFilters = {} 
   return (
     <div className="card p-4 mb-6">
       {/* Search bar */}
-      <form onSubmit={handleSearch} className="flex gap-2 mb-3">
+      <form onSubmit={handleSearchSubmit} className="flex gap-2 mb-3">
         <div className="relative flex-1">
           <HiOutlineSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
             placeholder="Search by title, subject, uploader..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="input-field pl-9"
+            onChange={(e) => handleSearchInput(e.target.value)}
+            className="input-field pl-9 pr-12"
           />
+          <kbd className="hidden sm:flex absolute right-3 top-1/2 -translate-y-1/2 items-center justify-center px-1.5 py-0.5 text-[10px] font-semibold text-slate-400 bg-slate-100 rounded border border-slate-200">
+            /
+          </kbd>
         </div>
         <button type="submit" className="btn-primary px-4">Search</button>
         <button

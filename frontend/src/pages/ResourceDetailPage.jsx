@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
-  getResourceById, incrementDownload, submitRating,
-  getUserRating, deleteResource, getUserProfile
+  incrementDownload, submitRating,
+  getUserRating, deleteResource, getUserProfile, subscribeToResource
 } from '../services/firestore';
+import { deleteResourceViaBackend } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { PageLoader } from '../components/common/LoadingSpinner';
 import StarRating from '../components/common/StarRating';
 import Avatar from '../components/common/Avatar';
+import BookmarkButton from '../components/common/BookmarkButton';
+import VersionHistory from '../components/resources/VersionHistory';
+import UploadNewVersionButton from '../components/resources/UploadNewVersionButton';
 import { RESOURCE_TYPES } from '../config/constants';
 import toast from 'react-hot-toast';
 import { formatDistanceToNow } from 'date-fns';
@@ -38,27 +42,41 @@ export default function ResourceDetailPage() {
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        const data = await getResourceById(id);
-        if (!data) { navigate('/browse'); return; }
-        setResource(data);
-        if (data.uploadedBy) {
+    let uploaderLoaded = false;
+    let hasReceivedData = false;
+
+    const unsubscribe = subscribeToResource(id, async (data, err) => {
+      if (err || !data) {
+        if (!hasReceivedData) navigate('/browse'); // only redirect if we never had data
+        setLoading(false);
+        return;
+      }
+
+      hasReceivedData = true;
+      setResource(data);
+      setLoading(false);
+
+      // Fetch uploader profile only once (not on every live update)
+      if (!uploaderLoaded && data.uploadedBy) {
+        uploaderLoaded = true;
+        try {
           const uploaderData = await getUserProfile(data.uploadedBy);
           setUploader(uploaderData);
-        }
-        if (currentUser) {
-          const rating = await getUserRating(id, currentUser.uid);
-          setUserRating(rating);
-        }
-      } catch (e) {
-        console.error(e);
-        navigate('/browse');
-      } finally {
-        setLoading(false);
+        } catch (_) {}
       }
-    };
-    load();
+    });
+
+    return unsubscribe;
+  }, [id]);
+
+  useEffect(() => {
+    if (!currentUser) {
+      setUserRating(0);
+      return;
+    }
+    getUserRating(id, currentUser.uid)
+      .then(setUserRating)
+      .catch(() => {});
   }, [id, currentUser]);
 
   const handleDownload = async () => {
@@ -84,14 +102,15 @@ export default function ResourceDetailPage() {
 
   const handleRating = async (stars) => {
     if (!currentUser) return toast.error('Please log in to rate resources.');
+    const previousRating = userRating;
+    setUserRating(stars); // optimistic
     setRatingLoading(true);
     try {
       await submitRating(id, currentUser.uid, stars);
-      setUserRating(stars);
-      const updated = await getResourceById(id);
-      setResource(updated);
+      // No need to manually refetch — the live subscription updates `resource` automatically.
       toast.success(`Rated ${stars} star${stars !== 1 ? 's' : ''}!`);
     } catch (e) {
+      setUserRating(previousRating); // revert on failure
       toast.error('Rating failed. Please try again.');
     } finally {
       setRatingLoading(false);
@@ -102,7 +121,11 @@ export default function ResourceDetailPage() {
     if (!window.confirm(`Delete "${resource.title}"? This cannot be undone.`)) return;
     setDeleting(true);
     try {
-      await deleteResource(id, resource.filePath, resource.uploadedBy);
+      try {
+        await deleteResourceViaBackend(id);
+      } catch (backendErr) {
+        await deleteResource(id, resource.filePath, resource.uploadedBy);
+      }
       toast.success('Resource deleted.');
       navigate('/browse');
     } catch (e) {
@@ -227,15 +250,20 @@ export default function ResourceDetailPage() {
               )}
             </div>
 
-            {/* Download button */}
-            <button
-              onClick={handleDownload}
-              disabled={downloading}
-              className="btn-primary w-full justify-center py-3 text-base mb-3"
-            >
-              <HiOutlineDownload className="w-5 h-5" />
-              {downloading ? 'Starting...' : 'Download'}
-            </button>
+            {/* Download + Bookmark */}
+            <div className="flex gap-2 mb-3">
+              <button
+                onClick={handleDownload}
+                disabled={downloading}
+                className="btn-primary flex-1 justify-center py-3 text-base"
+              >
+                <HiOutlineDownload className="w-5 h-5" />
+                {downloading ? 'Starting...' : 'Download'}
+              </button>
+              <div className="border border-slate-200 rounded-xl flex items-center justify-center">
+                <BookmarkButton resourceId={id} size="lg" />
+              </div>
+            </div>
 
             <a
               href={resource.fileURL}
@@ -279,16 +307,26 @@ export default function ResourceDetailPage() {
             </div>
           </div>
 
-          {/* Admin/Owner delete */}
+          {/* Version history */}
+          <VersionHistory resource={resource} />
+
+          {/* Admin/Owner controls */}
           {(isAdmin || isOwner) && (
-            <button
-              onClick={handleDelete}
-              disabled={deleting}
-              className="btn-danger w-full justify-center py-2.5 text-sm"
-            >
-              <HiOutlineTrash className="w-4 h-4" />
-              {deleting ? 'Deleting...' : 'Delete Resource'}
-            </button>
+            <>
+              <UploadNewVersionButton
+                resourceId={id}
+                userId={resource.uploadedBy}
+                onSuccess={() => {}}
+              />
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="btn-danger w-full justify-center py-2.5 text-sm"
+              >
+                <HiOutlineTrash className="w-4 h-4" />
+                {deleting ? 'Deleting...' : 'Delete Resource'}
+              </button>
+            </>
           )}
         </div>
       </div>

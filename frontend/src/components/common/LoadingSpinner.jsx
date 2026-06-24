@@ -50,3 +50,16 @@ export function SkeletonCard() {
     </div>
   );
 }
+
+export function SkeletonRow() {
+  return (
+    <div className="card p-4 flex items-center gap-4 animate-pulse">
+      <div className="w-10 h-10 rounded-xl shimmer flex-shrink-0" />
+      <div className="flex-1 min-w-0">
+        <div className="w-1/2 h-4 rounded shimmer mb-2" />
+        <div className="w-1/3 h-3 rounded shimmer" />
+      </div>
+      <div className="w-20 h-8 rounded-xl shimmer flex-shrink-0" />
+    </div>
+  );
+}

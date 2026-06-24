@@ -14,7 +14,9 @@ import {
   HiMenu,
   HiX,
   HiOutlineViewGrid,
+  HiOutlineBookmark,
 } from 'react-icons/hi';
+import { HiOutlineTrophy } from 'react-icons/hi2';
 
 export default function Navbar() {
   const { currentUser, userProfile, logout, isAdmin } = useAuth();
@@ -56,6 +58,9 @@ export default function Navbar() {
           <nav className="hidden md:flex items-center gap-6">
             <NavLink to="/browse" className={({ isActive }) => isActive ? activeNavLink : navLink}>
               Browse
+            </NavLink>
+            <NavLink to="/leaderboard" className={({ isActive }) => isActive ? activeNavLink : navLink}>
+              Leaderboard
             </NavLink>
             {currentUser && (
               <>
@@ -118,6 +123,13 @@ export default function Navbar() {
                     >
                       <HiOutlineViewGrid className="w-4 h-4" /> Dashboard
                     </Link>
+                    <Link
+                      to="/bookmarks"
+                      onClick={() => setProfileOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                    >
+                      <HiOutlineBookmark className="w-4 h-4" /> Saved Resources
+                    </Link>
                     {isAdmin && (
                       <Link
                         to="/admin"
@@ -164,6 +176,9 @@ export default function Navbar() {
             <NavLink to="/browse" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-700 hover:bg-slate-50 font-medium">
               <HiOutlineSearch className="w-4 h-4" /> Browse Resources
             </NavLink>
+            <NavLink to="/leaderboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-700 hover:bg-slate-50 font-medium">
+              <HiOutlineTrophy className="w-4 h-4" /> Leaderboard
+            </NavLink>
             {currentUser && (
               <>
                 <NavLink to="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-700 hover:bg-slate-50 font-medium">
@@ -171,6 +186,9 @@ export default function Navbar() {
                 </NavLink>
                 <NavLink to="/upload" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-700 hover:bg-slate-50 font-medium">
                   <HiOutlineUpload className="w-4 h-4" /> Upload Resource
+                </NavLink>
+                <NavLink to="/bookmarks" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-700 hover:bg-slate-50 font-medium">
+                  <HiOutlineBookmark className="w-4 h-4" /> Saved Resources
                 </NavLink>
               </>
             )}

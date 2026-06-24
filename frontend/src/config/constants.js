@@ -88,4 +88,4 @@ export const ACCEPTED_FILE_TYPES = {
   'image/webp': ['.webp'],
 };
 
-export const MAX_FILE_SIZE = 700 * 1024; // 700KB (Firestore doc limit is 1MB; free plan, no Storage)
+export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB (Cloudinary free tier easily handles this)

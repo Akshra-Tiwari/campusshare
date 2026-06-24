@@ -1,4 +1,5 @@
 const admin = require('../config/firebase');
+const cloudinary = require('../config/cloudinary');
 const db = admin.firestore();
 
 const getResources = async (req, res) => {
@@ -47,6 +48,22 @@ const deleteResource = async (req, res) => {
     }
 
     await db.collection('resources').doc(id).delete();
+
+    // Best-effort cleanup of the Cloudinary file(s). Resource deletion should
+    // not fail if Cloudinary cleanup fails — the Firestore doc is already gone.
+    const filesToDelete = [];
+    if (resource.filePath) filesToDelete.push(resource.filePath);
+    if (Array.isArray(resource.previousVersions)) {
+      resource.previousVersions.forEach((v) => {
+        if (v.filePath) filesToDelete.push(v.filePath);
+      });
+    }
+
+    await Promise.allSettled(
+      filesToDelete.map((publicId) =>
+        cloudinary.uploader.destroy(publicId, { resource_type: 'auto', invalidate: true })
+      )
+    );
 
     if (resource.uploadedBy) {
       await db.collection('users').doc(resource.uploadedBy).update({

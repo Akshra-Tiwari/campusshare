@@ -13,6 +13,8 @@ import UploadPage from './pages/UploadPage';
 import ResourceDetailPage from './pages/ResourceDetailPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminPage from './pages/AdminPage';
+import BookmarksPage from './pages/BookmarksPage';
+import LeaderboardPage from './pages/LeaderboardPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 const ProtectedRoute = ({ children }) => {
@@ -46,10 +48,12 @@ const AppRoutes = () => (
       <Route path="register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
       <Route path="forgot-password" element={<GuestRoute><ForgotPasswordPage /></GuestRoute>} />
 
-      <Route path="dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-      <Route path="upload"    element={<ProtectedRoute><UploadPage /></ProtectedRoute>} />
-      <Route path="profile"   element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-      <Route path="admin"     element={<AdminRoute><AdminPage /></AdminRoute>} />
+      <Route path="dashboard"   element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+      <Route path="upload"      element={<ProtectedRoute><UploadPage /></ProtectedRoute>} />
+      <Route path="profile"     element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+      <Route path="bookmarks"   element={<ProtectedRoute><BookmarksPage /></ProtectedRoute>} />
+      <Route path="leaderboard" element={<LeaderboardPage />} />
+      <Route path="admin"       element={<AdminRoute><AdminPage /></AdminRoute>} />
 
       <Route path="*" element={<NotFoundPage />} />
     </Route>

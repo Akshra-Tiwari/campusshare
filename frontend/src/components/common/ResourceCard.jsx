@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { HiOutlineDownload, HiOutlineDocumentText, HiOutlinePhotograph, HiOutlineClock, HiOutlineUser } from 'react-icons/hi';
 import StarRating from './StarRating';
+import BookmarkButton from './BookmarkButton';
 import { RESOURCE_TYPES } from '../../config/constants';
 import clsx from 'clsx';
 
@@ -38,7 +39,10 @@ export default function ResourceCard({ resource }) {
             : <HiOutlinePhotograph className="w-6 h-6 text-blue-500" />
           }
         </div>
-        <span className={typeColors[type] || typeColors.other}>{typeLabel}</span>
+        <div className="flex items-center gap-1.5">
+          <span className={typeColors[type] || typeColors.other}>{typeLabel}</span>
+          <BookmarkButton resourceId={id} size="sm" />
+        </div>
       </div>
 
       {/* Title */}
