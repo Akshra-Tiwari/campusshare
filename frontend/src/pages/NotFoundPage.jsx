@@ -1,25 +1,19 @@
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { HiOutlineHome, HiOutlineSearch } from 'react-icons/hi';
 
 export default function NotFoundPage() {
   return (
-    <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 text-center animate-fade-in">
-      <div className="w-24 h-24 bg-primary-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
-        <span className="text-5xl font-display font-black text-primary-200">?</span>
-      </div>
-      <h1 className="font-display font-black text-7xl text-primary-600 mb-2">404</h1>
-      <h2 className="font-display font-bold text-2xl text-slate-800 mb-3">Page not found</h2>
-      <p className="text-slate-500 mb-8 max-w-sm">
-        The page you're looking for doesn't exist or has been moved.
-      </p>
-      <div className="flex gap-3">
-        <Link to="/" className="btn-primary">
-          <HiOutlineHome className="w-4 h-4" /> Go Home
-        </Link>
-        <Link to="/browse" className="btn-secondary">
-          <HiOutlineSearch className="w-4 h-4" /> Browse Resources
-        </Link>
-      </div>
+    <div className="min-h-[80vh] flex items-center justify-center px-6" style={{background:'linear-gradient(135deg,rgba(219,209,237,0.25),rgba(237,232,208,0.95),rgba(171,190,237,0.20))'}}>
+      <motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{duration:0.5}} className="text-center max-w-md">
+        <p className="text-8xl font-black tracking-tight" style={{color:'rgba(110,99,46,0.10)'}}>404</p>
+        <h1 className="text-2xl font-bold text-[#2C2A1E] -mt-4 mb-3">Page not found</h1>
+        <p className="mb-8" style={{color:'#6B6344'}}>The page you're looking for doesn't exist or has been moved.</p>
+        <div className="flex gap-3 justify-center">
+          <Link to="/" className="btn-olive"><HiOutlineHome className="w-4 h-4"/> Go Home</Link>
+          <Link to="/browse" className="btn-ghost"><HiOutlineSearch className="w-4 h-4"/> Browse Resources</Link>
+        </div>
+      </motion.div>
     </div>
   );
 }

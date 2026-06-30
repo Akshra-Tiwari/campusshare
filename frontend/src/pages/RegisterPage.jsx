@@ -1,195 +1,168 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import { HiOutlineMail, HiOutlineLockClosed, HiOutlineUser, HiOutlineBookOpen } from 'react-icons/hi';
 import { FcGoogle } from 'react-icons/fc';
-import { APP_NAME, COLLEGE_NAME, BRANCHES, SEMESTERS } from '../config/constants';
+import { BRANCHES, SEMESTERS } from '../config/constants';
+
+const fadeUp = { hidden:{opacity:0,y:16}, visible:(i=0)=>({opacity:1,y:0,transition:{duration:0.5,delay:i*0.07,ease:[0.22,1,0.36,1]}}) };
+const stagger = { visible:{transition:{staggerChildren:0.07}} };
 
 export default function RegisterPage() {
   const { register, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({
-    displayName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    branch: '',
-    semester: '',
-  });
-  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({ displayName:'', email:'', password:'', confirmPassword:'', branch:'', semester:'' });
+  const [loading, setLoading]         = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const up = (k,v) => setForm(f=>({...f,[k]:v}));
 
-  const update = (key, value) => setForm((f) => ({ ...f, [key]: value }));
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    if (form.password !== form.confirmPassword) return toast.error('Passwords do not match');
-    if (form.password.length < 6) return toast.error('Password must be at least 6 characters');
+    if (form.password!==form.confirmPassword) return toast.error('Passwords do not match');
+    if (form.password.length<6) return toast.error('Password must be at least 6 characters');
     if (!form.branch) return toast.error('Please select your branch');
     if (!form.semester) return toast.error('Please select your semester');
-
     setLoading(true);
-    try {
-      await register(form.email, form.password, form.displayName, form.branch, Number(form.semester));
-      toast.success('Account created successfully!');
-      navigate('/dashboard');
-    } catch (err) {
-      const msg = err.code === 'auth/email-already-in-use' ? 'This email is already registered.' : err.message;
-      toast.error(msg);
-    } finally {
-      setLoading(false);
-    }
+    try { await register(form.email,form.password,form.displayName,form.branch,Number(form.semester)); toast.success('Account created!'); navigate('/dashboard'); }
+    catch (err) { toast.error(err.code==='auth/email-already-in-use'?'Email already registered.':err.message); }
+    finally { setLoading(false); }
   };
 
   const handleGoogle = async () => {
     setGoogleLoading(true);
-    try {
-      await loginWithGoogle();
-      toast.success('Welcome!');
-      navigate('/dashboard');
-    } catch (err) {
-      toast.error(err.message);
-    } finally {
-      setGoogleLoading(false);
-    }
+    try { await loginWithGoogle(); toast.success('Welcome!'); navigate('/dashboard'); }
+    catch (err) { toast.error(err.message); }
+    finally { setGoogleLoading(false); }
   };
 
+  const selectStyle = { appearance:'none', backgroundImage:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236E632E'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat:'no-repeat', backgroundPosition:'right 12px center', backgroundSize:'16px', paddingRight:'40px' };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="w-14 h-14 bg-gradient-to-br from-primary-600 to-primary-800 rounded-2xl flex items-center justify-center shadow-lg mx-auto mb-4">
-            <HiOutlineBookOpen className="text-white w-7 h-7" />
+    <div className="min-h-screen flex"
+         style={{ background:'linear-gradient(135deg,rgba(219,209,237,0.30) 0%,rgba(237,232,208,0.95) 40%,rgba(171,190,237,0.25) 100%)' }}>
+      <div className="blob-lavender w-[450px] h-[450px] top-0 right-0 opacity-35 fixed pointer-events-none" />
+      <div className="blob-olive   w-[300px] h-[300px] bottom-0 left-0 opacity-25 fixed pointer-events-none" />
+
+      {/* Left panel */}
+      <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-16 relative overflow-hidden"
+           style={{ background:'linear-gradient(160deg,rgba(237,232,208,0.90) 0%,rgba(219,209,237,0.50) 40%,rgba(171,190,237,0.40) 100%)' }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background:'radial-gradient(ellipse 100% 80% at 50% 50%,rgba(171,190,237,0.20),transparent)' }} />
+        <div className="relative z-10 max-w-md">
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-8"
+               style={{ background:'linear-gradient(135deg,#7A6F35,#6E632E)', boxShadow:'0 4px 16px rgba(110,99,46,0.30)' }}>
+            <HiOutlineBookOpen className="w-6 h-6" style={{ color:'#F5F0DC' }} />
           </div>
-          <h1 className="font-display font-bold text-2xl text-slate-800">{APP_NAME}</h1>
-          <p className="text-slate-500 text-sm mt-1">{COLLEGE_NAME}</p>
+          <h2 className="text-4xl font-extrabold mb-4 text-[#2C2A1E] tracking-tight">Join the community.</h2>
+          <p className="text-lg leading-relaxed mb-10" style={{ color:'#6B6344' }}>
+            Create a free account and start sharing knowledge with thousands of JNCT students.
+          </p>
+          {['Upload notes and help others','Access PYQs organized by semester','Rate and discover top resources','Track your contributions'].map((item,i) => (
+            <div key={item} className="flex items-center gap-3 mb-3">
+              <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                   style={{ background:'rgba(110,99,46,0.12)', border:'1px solid rgba(110,99,46,0.20)' }}>
+                <div className="w-1.5 h-1.5 rounded-full" style={{ background:'#6E632E' }} />
+              </div>
+              <p className="text-sm" style={{ color:'#4A4030' }}>{item}</p>
+            </div>
+          ))}
         </div>
+      </div>
 
-        <div className="card p-8">
-          <h2 className="font-display font-bold text-xl text-slate-800 mb-1">Create your account</h2>
-          <p className="text-slate-500 text-sm mb-6">Join the JNCT study community</p>
+      {/* Right form */}
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-16 overflow-y-auto relative z-10">
+        <motion.div variants={stagger} initial="hidden" animate="visible" className="w-full max-w-md py-8">
+          <motion.div custom={0} variants={fadeUp} className="mb-8">
+            <Link to="/" className="flex items-center gap-2 mb-8 lg:hidden">
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background:'linear-gradient(135deg,#7A6F35,#6E632E)' }}>
+                <HiOutlineBookOpen className="w-4 h-4" style={{ color:'#F5F0DC' }} />
+              </div>
+              <span className="font-bold text-[#2C2A1E]">CampusShare</span>
+            </Link>
+            <h1 className="text-2xl font-extrabold text-[#2C2A1E] tracking-tight">Create your account</h1>
+            <p className="text-sm mt-1.5" style={{ color:'#6B6344' }}>Free forever. No credit card required.</p>
+          </motion.div>
 
-          <button
-            onClick={handleGoogle}
-            disabled={googleLoading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition-all font-medium text-slate-700 text-sm mb-4 disabled:opacity-60"
-          >
+          <motion.button custom={1} variants={fadeUp} onClick={handleGoogle} disabled={googleLoading}
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-2xl border text-sm font-semibold transition-all duration-200 mb-5 disabled:opacity-50"
+            style={{ background:'rgba(237,232,208,0.80)', borderColor:'rgba(110,99,46,0.18)', color:'#2C2A1E', backdropFilter:'blur(8px)' }}
+            onMouseEnter={e=>{ e.currentTarget.style.background='rgba(219,209,237,0.60)'; }}
+            onMouseLeave={e=>{ e.currentTarget.style.background='rgba(237,232,208,0.80)'; }}>
             <FcGoogle className="w-5 h-5" />
             {googleLoading ? 'Signing up...' : 'Continue with Google'}
-          </button>
+          </motion.button>
 
-          <div className="flex items-center gap-3 mb-4">
-            <div className="flex-1 h-px bg-slate-200" />
-            <span className="text-xs text-slate-400">or fill the form</span>
-            <div className="flex-1 h-px bg-slate-200" />
-          </div>
+          <motion.div custom={2} variants={fadeUp} className="flex items-center gap-3 mb-5">
+            <div className="flex-1 h-px" style={{ background:'rgba(110,99,46,0.15)' }} />
+            <span className="text-xs" style={{ color:'#9A8F5A' }}>or fill in your details</span>
+            <div className="flex-1 h-px" style={{ background:'rgba(110,99,46,0.15)' }} />
+          </motion.div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="label">Full Name</label>
+          <motion.form variants={stagger} onSubmit={handleSubmit} className="space-y-4">
+            <motion.div custom={3} variants={fadeUp}>
+              <label className="field-label">Full Name</label>
               <div className="relative">
-                <HiOutlineUser className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Your full name"
-                  className="input-field pl-9"
-                  value={form.displayName}
-                  onChange={(e) => update('displayName', e.target.value)}
-                  required
-                />
+                <HiOutlineUser className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color:'#9A8F5A' }} />
+                <input type="text" placeholder="Your full name" className="input-field pl-10"
+                  value={form.displayName} onChange={e=>up('displayName',e.target.value)} required />
               </div>
-            </div>
+            </motion.div>
 
-            <div>
-              <label className="label">Email address</label>
+            <motion.div custom={4} variants={fadeUp}>
+              <label className="field-label">Email address</label>
               <div className="relative">
-                <HiOutlineMail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type="email"
-                  placeholder="you@example.com"
-                  className="input-field pl-9"
-                  value={form.email}
-                  onChange={(e) => update('email', e.target.value)}
-                  required
-                />
+                <HiOutlineMail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color:'#9A8F5A' }} />
+                <input type="email" placeholder="you@example.com" className="input-field pl-10"
+                  value={form.email} onChange={e=>up('email',e.target.value)} required />
               </div>
-            </div>
+            </motion.div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <motion.div custom={5} variants={fadeUp} className="grid grid-cols-2 gap-3">
               <div>
-                <label className="label">Branch</label>
-                <select
-                  className="input-field"
-                  value={form.branch}
-                  onChange={(e) => update('branch', e.target.value)}
-                  required
-                >
-                  <option value="">Select branch</option>
-                  {BRANCHES.map((b) => (
-                    <option key={b.value} value={b.value}>{b.value}</option>
-                  ))}
+                <label className="field-label">Branch</label>
+                <select className="input-field" style={selectStyle} value={form.branch} onChange={e=>up('branch',e.target.value)} required>
+                  <option value="">Branch</option>
+                  {BRANCHES.map(b=><option key={b.value} value={b.value}>{b.value}</option>)}
                 </select>
               </div>
               <div>
-                <label className="label">Semester</label>
-                <select
-                  className="input-field"
-                  value={form.semester}
-                  onChange={(e) => update('semester', e.target.value)}
-                  required
-                >
+                <label className="field-label">Semester</label>
+                <select className="input-field" style={selectStyle} value={form.semester} onChange={e=>up('semester',e.target.value)} required>
                   <option value="">Semester</option>
-                  {SEMESTERS.map((s) => (
-                    <option key={s} value={s}>Sem {s}</option>
-                  ))}
+                  {SEMESTERS.map(s=><option key={s} value={s}>Sem {s}</option>)}
                 </select>
               </div>
-            </div>
+            </motion.div>
 
-            <div>
-              <label className="label">Password</label>
+            <motion.div custom={6} variants={fadeUp}>
+              <label className="field-label">Password</label>
               <div className="relative">
-                <HiOutlineLockClosed className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type="password"
-                  placeholder="Min. 6 characters"
-                  className="input-field pl-9"
-                  value={form.password}
-                  onChange={(e) => update('password', e.target.value)}
-                  required
-                />
+                <HiOutlineLockClosed className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color:'#9A8F5A' }} />
+                <input type="password" placeholder="Min. 6 characters" className="input-field pl-10"
+                  value={form.password} onChange={e=>up('password',e.target.value)} required />
               </div>
-            </div>
+            </motion.div>
 
-            <div>
-              <label className="label">Confirm Password</label>
+            <motion.div custom={7} variants={fadeUp}>
+              <label className="field-label">Confirm Password</label>
               <div className="relative">
-                <HiOutlineLockClosed className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type="password"
-                  placeholder="Repeat your password"
-                  className="input-field pl-9"
-                  value={form.confirmPassword}
-                  onChange={(e) => update('confirmPassword', e.target.value)}
-                  required
-                />
+                <HiOutlineLockClosed className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color:'#9A8F5A' }} />
+                <input type="password" placeholder="Repeat your password" className="input-field pl-10"
+                  value={form.confirmPassword} onChange={e=>up('confirmPassword',e.target.value)} required />
               </div>
-            </div>
+            </motion.div>
 
-            <button type="submit" className="btn-primary w-full justify-center py-3 text-base" disabled={loading}>
+            <motion.button custom={8} variants={fadeUp} type="submit" disabled={loading} className="btn-olive w-full py-3 text-sm">
               {loading ? 'Creating account...' : 'Create Account'}
-            </button>
-          </form>
+            </motion.button>
+          </motion.form>
 
-          <p className="text-center text-sm text-slate-500 mt-5">
+          <motion.p custom={9} variants={fadeUp} className="text-center text-sm mt-6" style={{ color:'#6B6344' }}>
             Already have an account?{' '}
-            <Link to="/login" className="text-primary-600 hover:text-primary-700 font-semibold">
-              Sign in
-            </Link>
-          </p>
-        </div>
+            <Link to="/login" className="font-semibold" style={{ color:'#6E632E' }}>Sign in</Link>
+          </motion.p>
+        </motion.div>
       </div>
     </div>
   );

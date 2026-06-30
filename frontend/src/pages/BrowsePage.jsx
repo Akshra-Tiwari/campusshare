@@ -1,126 +1,115 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { subscribeToResources } from '../services/resources';
 import ResourceCard from '../components/common/ResourceCard';
 import SearchFilters from '../components/resources/SearchFilters';
 import { SkeletonCard } from '../components/common/LoadingSpinner';
 import EmptyState from '../components/common/EmptyState';
 import ErrorState from '../components/common/ErrorState';
-import { HiOutlineSearch } from 'react-icons/hi';
+import { HiOutlineSearch, HiOutlineViewGrid, HiOutlineViewList } from 'react-icons/hi';
 
-const SEARCH_DEBOUNCE_MS = 300;
+const fadeUp  = { hidden:{opacity:0,y:16}, visible:{opacity:1,y:0,transition:{duration:0.4,ease:[0.22,1,0.36,1]}} };
+const stagger = { visible:{transition:{staggerChildren:0.04}} };
 
 export default function BrowsePage() {
   const [searchParams] = useSearchParams();
   const [allResources, setAllResources] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [searchInput, setSearchInput] = useState('');
+  const [error, setError]     = useState(null);
+  const [searchInput, setSearchInput]         = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [view, setView] = useState('grid');
   const [filters, setFilters] = useState({
-    branch: searchParams.get('branch') || '',
-    semester: searchParams.get('semester') || '',
-    type: searchParams.get('type') || '',
-    subject: '',
+    branch: searchParams.get('branch')||'', semester: searchParams.get('semester')||'',
+    type: searchParams.get('type')||'', subject:'',
   });
+  const timer = useRef(null);
 
-  const debounceTimer = useRef(null);
-
-  // Debounce search input — avoids re-filtering on every keystroke.
   useEffect(() => {
-    if (debounceTimer.current) clearTimeout(debounceTimer.current);
-    debounceTimer.current = setTimeout(() => {
-      setDebouncedSearch(searchInput);
-    }, SEARCH_DEBOUNCE_MS);
-    return () => clearTimeout(debounceTimer.current);
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => setDebouncedSearch(searchInput), 300);
+    return () => clearTimeout(timer.current);
   }, [searchInput]);
 
-  // Real-time subscription — re-subscribes whenever field filters change.
-  // Text search is applied client-side on top of this live snapshot below.
   useEffect(() => {
-    setLoading(true);
-    setError(null);
-
-    const unsubscribe = subscribeToResources(filters, 60, (resources, err) => {
-      if (err) {
-        setError(err);
-        setLoading(false);
-        return;
-      }
-      setAllResources(resources);
-      setLoading(false);
+    setLoading(true); setError(null);
+    const unsub = subscribeToResources(filters, 60, (resources, err) => {
+      if (err) { setError(err); setLoading(false); return; }
+      setAllResources(resources); setLoading(false);
     });
-
-    return unsubscribe;
+    return unsub;
   }, [filters.branch, filters.semester, filters.type, filters.subject]);
 
   const resources = useMemo(() => {
     if (!debouncedSearch.trim()) return allResources;
-    const term = debouncedSearch.toLowerCase();
-    return allResources.filter(
-      (r) =>
-        r.title?.toLowerCase().includes(term) ||
-        r.subject?.toLowerCase().includes(term) ||
-        r.description?.toLowerCase().includes(term) ||
-        r.uploaderName?.toLowerCase().includes(term)
+    const t = debouncedSearch.toLowerCase();
+    return allResources.filter(r =>
+      r.title?.toLowerCase().includes(t) || r.subject?.toLowerCase().includes(t) ||
+      r.description?.toLowerCase().includes(t) || r.uploaderName?.toLowerCase().includes(t)
     );
   }, [allResources, debouncedSearch]);
 
-  const handleSearch = (term) => {
-    setSearchInput(term);
-  };
-
-  const handleFilter = (activeFilters) => {
-    setFilters(activeFilters);
-  };
-
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-slide-up">
-      <div className="page-header">
-        <h1 className="font-display font-bold text-3xl text-slate-800">Browse Resources</h1>
-        <p className="text-slate-500 mt-1 flex items-center gap-2">
-          {resources.length > 0 && !loading ? (
-            <>
-              {resources.length} resource{resources.length !== 1 ? 's' : ''} found
-              <span className="inline-flex items-center gap-1 text-xs text-emerald-600 font-medium">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live
-              </span>
-            </>
+    <div className="min-h-screen" style={{ background:'linear-gradient(160deg,rgba(237,232,208,0.95) 0%,rgba(171,190,237,0.18) 35%,rgba(237,232,208,0.95) 65%,rgba(219,209,237,0.20) 100%)' }}>
+      <div className="blob-pastel w-[450px] h-[450px] top-0 right-0 opacity-25 fixed pointer-events-none" />
+      <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-10 relative z-10">
+        <motion.div variants={stagger} initial="hidden" animate="visible">
+
+          <motion.div variants={fadeUp} className="mb-8">
+            <h1 className="text-2xl font-extrabold text-[#2C2A1E] tracking-tight">Browse Resources</h1>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-sm" style={{ color:'#6B6344' }}>
+                {loading ? 'Loading...' : `${resources.length} resource${resources.length!==1?'s':''}`}
+              </p>
+              {!loading && !error && (
+                <span className="flex items-center gap-1 text-xs font-medium" style={{ color:'#6E632E' }}>
+                  <span className="w-1.5 h-1.5 rounded-full animate-pulse-soft" style={{ background:'#6E632E' }} /> Live
+                </span>
+              )}
+            </div>
+          </motion.div>
+
+          <motion.div variants={fadeUp}>
+            <SearchFilters onSearch={setSearchInput} onFilter={setFilters} initialFilters={filters} searchValue={searchInput} />
+          </motion.div>
+
+          <motion.div variants={fadeUp} className="flex items-center justify-between mb-5">
+            <p className="text-xs font-bold uppercase tracking-widest" style={{ color:'#9A8F5A' }}>
+              {debouncedSearch ? `Results for "${debouncedSearch}"` : 'All resources'}
+            </p>
+            <div className="flex items-center gap-1 p-1 rounded-2xl border"
+                 style={{ background:'rgba(237,232,208,0.80)', borderColor:'rgba(110,99,46,0.15)' }}>
+              {[['grid',HiOutlineViewGrid],['list',HiOutlineViewList]].map(([v,Icon]) => (
+                <button key={v} onClick={() => setView(v)}
+                  className="p-1.5 rounded-xl transition-all duration-200"
+                  style={view===v ? { background:'rgba(110,99,46,0.12)', color:'#6E632E' } : { color:'#9A8F5A' }}>
+                  <Icon className="w-4 h-4" />
+                </button>
+              ))}
+            </div>
+          </motion.div>
+
+          {error ? (
+            <ErrorState onRetry={() => setFilters(f => ({...f}))} />
+          ) : loading ? (
+            <div className={`grid gap-4 ${view==='grid'?'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3':'grid-cols-1'}`}>
+              {Array.from({length:9}).map((_,i) => <SkeletonCard key={i} />)}
+            </div>
+          ) : resources.length === 0 ? (
+            <EmptyState icon={HiOutlineSearch} title="No resources found"
+              description="Try different filters or be the first to upload for this criteria."
+              actionLabel="Upload Resource" actionTo="/upload" />
           ) : (
-            'Find notes, PYQs, assignments and more.'
+            <motion.div variants={stagger} initial="hidden" animate="visible"
+              className={`grid gap-4 ${view==='grid'?'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3':'grid-cols-1'}`}>
+              {resources.map(r => (
+                <motion.div key={r.id} variants={fadeUp}><ResourceCard resource={r} /></motion.div>
+              ))}
+            </motion.div>
           )}
-        </p>
+        </motion.div>
       </div>
-
-      <SearchFilters
-        onSearch={handleSearch}
-        onFilter={handleFilter}
-        initialFilters={filters}
-      />
-
-      {error ? (
-        <ErrorState
-          title="Couldn't load resources"
-          description="We had trouble connecting to the server. Check your connection and try again."
-          onRetry={() => setFilters((f) => ({ ...f }))}
-        />
-      ) : loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {Array.from({ length: 9 }).map((_, i) => <SkeletonCard key={i} />)}
-        </div>
-      ) : resources.length === 0 ? (
-        <EmptyState
-          icon={HiOutlineSearch}
-          title="No resources found"
-          description="Try adjusting your search or filters, or be the first to upload something for this criteria."
-          actionLabel="Upload Resource"
-          actionTo="/upload"
-        />
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {resources.map((r) => <ResourceCard key={r.id} resource={r} />)}
-        </div>
-      )}
     </div>
   );
 }
