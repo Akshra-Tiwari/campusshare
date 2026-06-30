@@ -31,9 +31,6 @@ export default function ResourceCard({ resource }) {
 
   const typeLabel = RESOURCE_TYPES.find(t => t.value === type)?.label || type;
   const isPDF     = fileType === 'application/pdf';
-  const date      = createdAt?.toDate
-    ? formatDistanceToNow(createdAt.toDate(), { addSuffix: true })
-    : 'Recently';
   const badge = TYPE_BADGE[type] || TYPE_BADGE.other;
   const grad  = TYPE_GRAD[type]  || TYPE_GRAD.other;
 

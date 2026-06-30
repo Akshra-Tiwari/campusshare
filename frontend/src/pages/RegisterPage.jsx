@@ -58,7 +58,7 @@ export default function RegisterPage() {
           <p className="text-lg leading-relaxed mb-10" style={{ color:'#6B6344' }}>
             Create a free account and start sharing knowledge with thousands of JNCT students.
           </p>
-          {['Upload notes and help others','Access PYQs organized by semester','Rate and discover top resources','Track your contributions'].map((item,i) => (
+          {['Upload notes and help others','Access PYQs organized by semester','Rate and discover top resources','Track your contributions'].map((item) => (
             <div key={item} className="flex items-center gap-3 mb-3">
               <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
                    style={{ background:'rgba(110,99,46,0.12)', border:'1px solid rgba(110,99,46,0.20)' }}>

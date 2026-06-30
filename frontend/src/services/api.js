@@ -20,7 +20,8 @@ const authedFetch = async (path, options = {}) => {
     try {
       const data = await res.json();
       message = data.error || message;
-    } catch (_) {}
+    } catch (_) {  // Response body is not JSON, keep the default error message.
+}
     throw new Error(message);
   }
 
