@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import {
   HiOutlineBookOpen, HiOutlineUpload, HiOutlineUser,
   HiOutlineCog, HiOutlineLogout, HiOutlineViewGrid,
-  HiOutlineBookmark, HiOutlineX, HiMenu, HiChevronDown,
+  HiOutlineBookmark, HiOutlineStar, HiOutlineX, HiMenu, HiChevronDown,
 } from 'react-icons/hi';
 
 const NAV_LINKS = [

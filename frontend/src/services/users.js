@@ -5,6 +5,7 @@ import {
   doc,
   updateDoc,
   query,
+  where,
   orderBy,
   limit,
   serverTimestamp,

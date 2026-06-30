@@ -83,7 +83,7 @@ export default function LoginPage() {
 
           {/* Google */}
           <motion.button custom={1} variants={fadeUp} onClick={handleGoogle} disabled={googleLoading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-2xl border text-sm font-semibold transition-all duration-200 mb-5 disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-2xl border text-sm font-semibold transition-all duration-250 mb-5 disabled:opacity-50"
             style={{ background:'rgba(237,232,208,0.80)', borderColor:'rgba(110,99,46,0.18)', color:'#2C2A1E', backdropFilter:'blur(8px)' }}
             onMouseEnter={e=>{ e.currentTarget.style.background='rgba(219,209,237,0.60)'; e.currentTarget.style.borderColor='rgba(110,99,46,0.30)'; }}
             onMouseLeave={e=>{ e.currentTarget.style.background='rgba(237,232,208,0.80)'; e.currentTarget.style.borderColor='rgba(110,99,46,0.18)'; }}>

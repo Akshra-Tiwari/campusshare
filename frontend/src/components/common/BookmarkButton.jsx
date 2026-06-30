@@ -3,6 +3,7 @@ import { HiBookmark, HiOutlineBookmark } from 'react-icons/hi';
 import { useAuth } from '../../context/AuthContext';
 import { addBookmark, removeBookmark, subscribeToBookmark } from '../../services/bookmarks';
 import toast from 'react-hot-toast';
+import clsx from 'clsx';
 
 export default function BookmarkButton({ resourceId, size = 'md', variant = 'icon' }) {
   const { currentUser } = useAuth();

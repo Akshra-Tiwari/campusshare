@@ -14,7 +14,7 @@ export default function StarRating({ value = 0, onChange, readonly = false, size
             onClick={() => !readonly && onChange?.(star)}
             onMouseEnter={() => !readonly && setHover(star)}
             onMouseLeave={() => !readonly && setHover(0)}
-            className={clsx('transition-all duration-100', !readonly && 'cursor-pointer hover:scale-110', readonly && 'cursor-default')}>
+            className={clsx('transition-all duration-100', !readonly && 'cursor-pointer hover:scale-115', readonly && 'cursor-default')}>
             <HiStar className={clsx(sizes[size], 'transition-colors duration-100')}
               style={{ color: filled ? '#6E632E' : 'rgba(110,99,46,0.20)' }} />
           </button>

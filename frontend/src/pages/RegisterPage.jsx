@@ -58,7 +58,7 @@ export default function RegisterPage() {
           <p className="text-lg leading-relaxed mb-10" style={{ color:'#6B6344' }}>
             Create a free account and start sharing knowledge with thousands of JNCT students.
           </p>
-          {['Upload notes and help others','Access PYQs organized by semester','Rate and discover top resources','Track your contributions'].map((item) => (
+          {['Upload notes and help others','Access PYQs organized by semester','Rate and discover top resources','Track your contributions'].map((item,i) => (
             <div key={item} className="flex items-center gap-3 mb-3">
               <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
                    style={{ background:'rgba(110,99,46,0.12)', border:'1px solid rgba(110,99,46,0.20)' }}>
@@ -85,7 +85,7 @@ export default function RegisterPage() {
           </motion.div>
 
           <motion.button custom={1} variants={fadeUp} onClick={handleGoogle} disabled={googleLoading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-2xl border text-sm font-semibold transition-all duration-200 mb-5 disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-2xl border text-sm font-semibold transition-all duration-250 mb-5 disabled:opacity-50"
             style={{ background:'rgba(237,232,208,0.80)', borderColor:'rgba(110,99,46,0.18)', color:'#2C2A1E', backdropFilter:'blur(8px)' }}
             onMouseEnter={e=>{ e.currentTarget.style.background='rgba(219,209,237,0.60)'; }}
             onMouseLeave={e=>{ e.currentTarget.style.background='rgba(237,232,208,0.80)'; }}>

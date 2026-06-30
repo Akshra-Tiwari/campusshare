@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { formatDistanceToNow } from 'date-fns';
 import { motion } from 'framer-motion';
 import { HiOutlineDownload, HiOutlineDocumentText, HiOutlinePhotograph } from 'react-icons/hi';
 import StarRating from './StarRating';
@@ -26,10 +27,13 @@ const TYPE_BADGE = {
 export default function ResourceCard({ resource }) {
   const { id, title, subject, branch, semester, type, fileType,
           downloads = 0, averageRating = 0, totalRatings = 0,
-          uploaderName } = resource;
+          uploaderName, createdAt } = resource;
 
   const typeLabel = RESOURCE_TYPES.find(t => t.value === type)?.label || type;
   const isPDF     = fileType === 'application/pdf';
+  const date      = createdAt?.toDate
+    ? formatDistanceToNow(createdAt.toDate(), { addSuffix: true })
+    : 'Recently';
   const badge = TYPE_BADGE[type] || TYPE_BADGE.other;
   const grad  = TYPE_GRAD[type]  || TYPE_GRAD.other;
 
