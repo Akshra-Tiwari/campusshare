@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { formatDistanceToNow } from 'date-fns';
 import { motion } from 'framer-motion';
 import { HiOutlineDownload, HiOutlineDocumentText, HiOutlinePhotograph } from 'react-icons/hi';
 import StarRating from './StarRating';
@@ -27,7 +26,7 @@ const TYPE_BADGE = {
 export default function ResourceCard({ resource }) {
   const { id, title, subject, branch, semester, type, fileType,
           downloads = 0, averageRating = 0, totalRatings = 0,
-          uploaderName, createdAt } = resource;
+          uploaderName } = resource;
 
   const typeLabel = RESOURCE_TYPES.find(t => t.value === type)?.label || type;
   const isPDF     = fileType === 'application/pdf';
