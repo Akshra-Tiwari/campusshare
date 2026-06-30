@@ -21,7 +21,17 @@ export default [
     },
     rules: {
       ...pluginReact.configs.recommended.rules,
+
+      // React 17+
       "react/react-in-jsx-scope": "off",
+
+      // Not using PropTypes
+      "react/prop-types": "off",
+
+      // Relax these for now
+      "no-unused-vars": "warn",
+      "react/no-unescaped-entities": "off",
+      "no-empty": "warn",
     },
     settings: {
       react: {
